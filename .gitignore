@@ -1,3 +1,4 @@
 mvenv/
 .idea/
 __pycache__
+logs/
