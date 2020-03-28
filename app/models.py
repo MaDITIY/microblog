@@ -1,7 +1,10 @@
-from app import db, login
+import jwt
+
+from app import db, login, app
 from datetime import datetime
 from hashlib import md5
 from flask_login import UserMixin
+from time import time
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -34,6 +37,20 @@ class User(UserMixin, db.Model):
         ),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic'
     )
+
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.get(id)
 
     def followed_posts(self):
         followed = Post.query.join(
