@@ -21,7 +21,6 @@ from app.models import User
 @app.route('/index')
 @login_required
 def index():
-    user = {'username': 'Dzianis'}
     posts = [
         {
             'author': {'username': 'John'},
@@ -45,11 +44,11 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user is None or not user.check_password(form.password.data):
+        user_instance = User.query.filter_by(username=form.username.data).first()
+        if user_instance is None or not user_instance.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('login'))
-        login_user(user, remember=form.remember_me.data)
+        login_user(user_instance, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
@@ -69,10 +68,21 @@ def register():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
+        user_instance = User(username=form.username.data, email=form.email.data)
+        user_instance.set_password(form.password.data)
+        db.session.add(user_instance)
         db.session.commit()
         flash("Congratulations, you're now registered!")
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    user_instance = User.query.filter_by(username=username).first_or_404()
+    posts = [
+        {'author': user_instance, 'body': 'Test post #1'},
+        {'author': user_instance, 'body': 'Test post #2'},
+    ]
+    return render_template('user.html', user=user_instance, posts=posts)
