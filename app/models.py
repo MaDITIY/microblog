@@ -1,9 +1,13 @@
 from datetime import datetime
 
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from app import db
+from app import login
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     """User model representing app user entity."""
     __tablename__ = 'users'
 
@@ -16,6 +20,20 @@ class User(db.Model):
     def __repr__(self):
         """User model string representation."""
         return f'<User {self.username}>'
+
+    def set_password(self, password: str) -> None:
+        """Generate password hash for given password."""
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password: str) -> bool:
+        """Check if password matches self password hash."""
+        return check_password_hash(self.password_hash, password)
+
+
+@login.user_loader
+def load_user(user_id: str) -> User:
+    """Get user from DB to load to user session."""
+    return User.query.get(int(user_id))
 
 
 class Post(db.Model):
