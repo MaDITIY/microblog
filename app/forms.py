@@ -3,10 +3,12 @@ from wtforms import BooleanField
 from wtforms import PasswordField
 from wtforms import StringField
 from wtforms import SubmitField
+from wtforms import TextAreaField
 from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import EqualTo
 from wtforms.validators import ValidationError
+from wtforms.validators import Length
 
 from app.models import User
 
@@ -38,3 +40,10 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('This email address is already in use.')
+
+
+class EditProfileForm(FlaskForm):
+    """Edit User profile form."""
+    username = StringField('Username', validators=[DataRequired()])
+    about_me = TextAreaField('About me', validators=[Length(min=0, max=140)])
+    submit = SubmitField('Submit')
