@@ -1,5 +1,6 @@
 from datetime import datetime
 from hashlib import md5
+from typing import Self
 
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -46,6 +47,32 @@ class User(db.Model, UserMixin):
     def check_password(self, password: str) -> bool:
         """Check if password matches self password hash."""
         return check_password_hash(self.password_hash, password)
+
+    def follow(self, user: Self) -> None:
+        """Follow given user."""
+        if not self.is_following(user):
+            self.followed.append(user)
+
+    def unfollow(self, user: Self) -> None:
+        """Unfollow given user."""
+        if self.is_following(user):
+            self.followed.remove(user)
+
+    def is_following(self, user: Self) -> None:
+        """Check if self is following given user."""
+        return self.followed.filter(
+            followers.c.followed_id == user.id
+        ).count() > 0
+
+    def followed_posts(self):
+        """Get all posts of people who are followed with own posts."""
+        followed = Post.query.join(
+            followers, (followers.c.followed_id == Post.user_id)
+        ).filter(
+            followers.c.follower_id == self.id
+        )
+        own = Post.query.filter_by(user_id=self.id)
+        return followed.union(own).order_by(Post.timestamp.desc())
 
     def avatar(self, size):
         """Generate user avatar."""
