@@ -41,15 +41,48 @@ def index():
         db.session.commit()
         flash('Your post is now live!')
         return redirect(url_for('index'))
-    posts = current_user.followed_posts().all()
-    return render_template('index.html', title='Home', form=form, posts=posts)
+    page = request.args.get('page', 1, type=int)
+    posts_paginator = Post.query.order_by(Post.timestamp.desc()).paginate(
+        page=page,
+        max_per_page=app.config['MAX_POSTS_PER_PAGE'],
+        error_out=False,
+    )
+    next_page_url = url_for('index', page=posts_paginator.next_num) \
+        if posts_paginator.has_next else None
+    prev_page_url = url_for('index', page=posts_paginator.prev_num) \
+        if posts_paginator.has_prev else None
+    posts = posts_paginator.items
+    return render_template(
+        'index.html',
+        title='Explore',
+        form=form,
+        posts=posts,
+        next_page_url=next_page_url,
+        prev_page_url=prev_page_url,
+    )
 
 
 @app.route('/explore')
 @login_required
 def explore():
-    posts = Post.query.order_by(Post.timestamp.desc()).all()
-    return render_template('index.html', title='Explore', posts=posts)
+    page = request.args.get('page', 1, type=int)
+    posts_paginator = Post.query.order_by(Post.timestamp.desc()).paginate(
+        page=page,
+        max_per_page=app.config['MAX_POSTS_PER_PAGE'],
+        error_out=False,
+    )
+    next_page_url = url_for('index', page=posts_paginator.next_num) \
+        if posts_paginator.has_next else None
+    prev_page_url = url_for('index', page=posts_paginator.prev_num) \
+        if posts_paginator.has_prev else None
+    posts = posts_paginator.items
+    return render_template(
+        'index.html',
+        title='Explore',
+        posts=posts,
+        next_page_url=next_page_url,
+        prev_page_url=prev_page_url,
+    )
 
 
 @app.route('/login', methods=['GET', 'POST'])
