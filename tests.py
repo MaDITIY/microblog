@@ -14,7 +14,6 @@ class TestUser(TestCase):
     """Test class to test User model."""
     def setUp(self) -> None:
         """Class setup."""
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         self.app_context = app.app_context()
         self.app_context.push()
         db.create_all()

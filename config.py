@@ -4,13 +4,14 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 sqlite_uri = f'sqlite:///{os.path.join(basedir, "app.db")}'
 postgres_db_name = 'microblog'
-postgres_uri = f'postgresql:///{postgres_db_name}'
+DEV_DB_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') or f'postgresql:///{postgres_db_name}'
+TEST_DB_URI = 'sqlite://'
 
 
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'super-secret-key'
-
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or postgres_uri
+    TESTING = int(os.environ.get('TESTING_MODE', '0'))
+    SQLALCHEMY_DATABASE_URI = TEST_DB_URI if TESTING else DEV_DB_URI
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
