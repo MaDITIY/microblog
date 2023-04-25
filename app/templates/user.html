@@ -24,4 +24,10 @@
     {% for post in posts %}
         {% include '_post.html' %}
     {% endfor %}
+    {% if prev_page_url %}
+        <a href="{{ prev_page_url }}">Newer posts</a>
+    {% endif %}
+    {% if next_page_url %}
+        <a href="{{ next_page_url }}">Older posts</a>
+    {% endif %}
 {% endblock %}

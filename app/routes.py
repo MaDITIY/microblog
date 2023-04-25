@@ -128,8 +128,24 @@ def register():
 @login_required
 def user(username):
     user_instance = User.query.filter_by(username=username).first_or_404()
-    posts = Post.query.filter_by(user_id=user_instance.id).order_by(Post.timestamp.desc()).all()
-    return render_template('user.html', user=user_instance, posts=posts)
+    page = request.args.get('page', 1, type=int)
+    posts_paginator = user_instance.posts.order_by(Post.timestamp.desc()).paginate(
+        page=page,
+        max_per_page=app.config['MAX_POSTS_PER_PAGE'],
+        error_out=False,
+    )
+    next_page_url = url_for('user', username=username, page=posts_paginator.next_num) \
+        if posts_paginator.has_next else None
+    prev_page_url = url_for('user', username=username, page=posts_paginator.prev_num) \
+        if posts_paginator.has_prev else None
+    posts = posts_paginator.items
+    return render_template(
+        'user.html',
+        user=user_instance,
+        posts=posts,
+        next_page_url=next_page_url,
+        prev_page_url=prev_page_url,
+    )
 
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
