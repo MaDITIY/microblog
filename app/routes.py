@@ -45,6 +45,13 @@ def index():
     return render_template('index.html', title='Home', form=form, posts=posts)
 
 
+@app.route('/explore')
+@login_required
+def explore():
+    posts = Post.query.order_by(Post.timestamp.desc()).all()
+    return render_template('index.html', title='Explore', posts=posts)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -88,10 +95,7 @@ def register():
 @login_required
 def user(username):
     user_instance = User.query.filter_by(username=username).first_or_404()
-    posts = [
-        {'author': user_instance, 'body': 'Test post #1'},
-        {'author': user_instance, 'body': 'Test post #2'},
-    ]
+    posts = Post.query.filter_by(user_id=user_instance.id).order_by(Post.timestamp.desc()).all()
     return render_template('user.html', user=user_instance, posts=posts)
 
 
