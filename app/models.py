@@ -1,6 +1,5 @@
 from datetime import datetime
 from hashlib import md5
-from typing import Self
 
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -48,17 +47,17 @@ class User(db.Model, UserMixin):
         """Check if password matches self password hash."""
         return check_password_hash(self.password_hash, password)
 
-    def follow(self, user: Self) -> None:
+    def follow(self, user: 'User') -> None:
         """Follow given user."""
         if not self.is_following(user):
             self.followed.append(user)
 
-    def unfollow(self, user: Self) -> None:
+    def unfollow(self, user: 'User') -> None:
         """Unfollow given user."""
         if self.is_following(user):
             self.followed.remove(user)
 
-    def is_following(self, user: Self) -> None:
+    def is_following(self, user: 'User') -> None:
         """Check if self is following given user."""
         return self.followed.filter(
             followers.c.followed_id == user.id
@@ -74,7 +73,7 @@ class User(db.Model, UserMixin):
         own = Post.query.filter_by(user_id=self.id)
         return followed.union(own).order_by(Post.timestamp.desc())
 
-    def avatar(self, size):
+    def avatar(self, size: int) -> str:
         """Generate user avatar."""
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
