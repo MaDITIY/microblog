@@ -64,7 +64,20 @@ class EditProfileForm(FlaskForm):
 class PostForm(FlaskForm):
     """Form to write new users posts."""
     post = TextAreaField(
-        'Say something', 
+        'Say something',
         validators=[DataRequired(), Length(min=1, max=140)]
     )
     submit = SubmitField('Submit')
+
+
+class ResetPasswordRequestForm(FlaskForm):
+    """Form to request password reset email."""
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+
+class ResetPasswordForm(FlaskForm):
+    """Form to reset password."""
+    password = PasswordField('Password', validators=[DataRequired()])
+    password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Reset Password')

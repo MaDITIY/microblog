@@ -1,9 +1,12 @@
 from datetime import datetime
+from time import time
 from hashlib import md5
 
+import jwt
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from app import app
 from app import db
 from app import login
 
@@ -77,6 +80,27 @@ class User(db.Model, UserMixin):
         """Generate user avatar."""
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
+
+    def get_reset_password_token(self, expires_in=600):
+        """Get JWT token for password reset."""
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'],
+            algorithm='HS256'
+        )
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        """Verify reset password token."""
+        try:
+            user_id = jwt.decode(
+                token,
+                app.config['SECRET_KEY'],
+                algorithms=['HS256']
+            )['reset_password']
+        except Exception as e:
+            return
+        return User.query.get(user_id)
 
 
 @login.user_loader
