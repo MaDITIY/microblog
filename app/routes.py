@@ -46,7 +46,7 @@ def index():
         flash('Your post is now live!')
         return redirect(url_for('index'))
     page = request.args.get('page', 1, type=int)
-    posts_paginator = Post.query.order_by(Post.timestamp.desc()).paginate(
+    posts_paginator = current_user.followed_posts().paginate(
         page=page,
         max_per_page=app.config['MAX_POSTS_PER_PAGE'],
         error_out=False,
