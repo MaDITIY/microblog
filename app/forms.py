@@ -81,3 +81,8 @@ class ResetPasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
+
+
+class EmptyForm(FlaskForm):
+    """Filler forms with no business logic"""
+    submit = SubmitField('Submit')

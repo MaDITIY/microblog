@@ -16,6 +16,7 @@ from app import app
 from app import db
 from app.email import send_password_reset_email
 from app.forms import EditProfileForm
+from app.forms import EmptyForm
 from app.forms import LoginForm
 from app.forms import PostForm
 from app.forms import RegistrationForm
@@ -142,12 +143,14 @@ def user(username):
     prev_page_url = url_for('user', username=username, page=posts_paginator.prev_num) \
         if posts_paginator.has_prev else None
     posts = posts_paginator.items
+    form = EmptyForm()
     return render_template(
         'user.html',
         user=user_instance,
         posts=posts,
         next_page_url=next_page_url,
         prev_page_url=prev_page_url,
+        form=form,
     )
 
 
@@ -167,7 +170,7 @@ def edit_profile():
     return render_template('edit_profile.html', title='Edit Profile', form=form)
 
 
-@app.route('/follow/<username>')
+@app.route('/follow/<username>', methods=['POST'])
 @login_required
 def follow(username):
     user_instance = User.query.filter_by(username=username).first()
@@ -183,7 +186,7 @@ def follow(username):
     return redirect(url_for('user', username=username))
 
 
-@app.route('/unfollow/<username>')
+@app.route('/unfollow/<username>', methods=['POST'])
 @login_required
 def unfollow(username):
     user_instance = User.query.filter_by(username=username).first()
