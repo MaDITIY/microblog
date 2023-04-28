@@ -4,7 +4,15 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 sqlite_uri = f'sqlite:///{os.path.join(basedir, "app.db")}'
 postgres_db_name = 'microblog'
-DEV_DB_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') or f'postgresql:///{postgres_db_name}'
+postgres_uri = f'postgresql:///{postgres_db_name}'
+
+rdms_name_uri_map = {
+    'postgresql': postgres_uri,
+    'sqlite': sqlite_uri,
+}
+
+RDMS_NAME = os.environ.get('RDMS_NAME', 'postgresql')
+DEV_DB_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') or rdms_name_uri_map[RDMS_NAME]
 TEST_DB_URI = 'sqlite://'
 
 

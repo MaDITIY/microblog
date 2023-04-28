@@ -2,5 +2,8 @@ __pycache__/
 app/__pycache__/
 
 .idea/
+.vscode/
+venv/
+*.db
 logs/
 *.env
