@@ -6,6 +6,7 @@ from flask import render_template
 from flask import redirect
 from flask import request
 from flask import url_for
+from flask_babel import _
 from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
@@ -43,7 +44,7 @@ def index():
         post = Post(body=form.post.data, author=current_user)
         db.session.add(post)
         db.session.commit()
-        flash('Your post is now live!')
+        flash(_('Your post is now live!'))
         return redirect(url_for('index'))
     page = request.args.get('page', 1, type=int)
     posts_paginator = current_user.followed_posts().paginate(
@@ -175,7 +176,7 @@ def edit_profile():
 def follow(username):
     user_instance = User.query.filter_by(username=username).first()
     if user_instance is None:
-        flash(f'User {username} not found')
+        flash(_('User %(username)s not found', username=username))
         return redirect(url_for('index'))
     if user_instance == current_user:
         flash(f'You can\'t follow yourself!')
