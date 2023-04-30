@@ -11,6 +11,7 @@ from flask_login import current_user
 from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
+from guess_language import guess_language
 from werkzeug.urls import url_parse
 
 from app import app
@@ -27,6 +28,10 @@ from app.models import Post
 from app.models import User
 
 
+UNKNOWN_LANGUAGE = 'UNKNOWN'
+MAX_LANGUAGE_LEN = 10
+
+
 @app.before_request
 def before_request():
     """Before request executions."""
@@ -41,7 +46,12 @@ def before_request():
 def index():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(body=form.post.data, author=current_user)
+        post_body = form.post.data
+        language = guess_language(post_body)
+        if language == UNKNOWN_LANGUAGE or \
+                len(language) > 10:
+            language = ''
+        post = Post(body=post_body, author=current_user, language=language)
         db.session.add(post)
         db.session.commit()
         flash(_('Your post is now live!'))
