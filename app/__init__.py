@@ -4,6 +4,7 @@ from logging.handlers import SMTPHandler
 from logging.handlers import RotatingFileHandler
 
 from flask import Flask
+from flask import g
 from flask import request
 from flask_babel import Babel
 from flask_babel import lazy_gettext as _l
@@ -33,8 +34,9 @@ with app.app_context():
     @babel.localeselector
     def get_locale():
         """Get application locale."""
-        # return request.accept_languages.best_match(app.config['LANGUAGES'])
-        return 'en'
+        locale = request.accept_languages.best_match(app.config['LANGUAGES'])
+        g.locale = locale
+        return g.locale
 
 
 if not app.debug:

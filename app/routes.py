@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from flask import flash
+from flask import jsonify
 from flask import render_template
 from flask import redirect
 from flask import request
@@ -26,6 +27,7 @@ from app.forms import ResetPasswordForm
 from app.forms import ResetPasswordRequestForm
 from app.models import Post
 from app.models import User
+from app.translate import translate
 
 
 UNKNOWN_LANGUAGE = 'UNKNOWN'
@@ -241,3 +243,15 @@ def reset_password(token):
         flash('Your password successfully reset.')
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
+
+
+@app.route('/translate', methods=['POST'])
+@login_required
+def translate_text():
+    return jsonify({
+        'text': translate(
+            request.form['text'],
+            request.form['source_language'],
+            request.form['dest_language'],
+        )
+    })
