@@ -30,7 +30,10 @@ babel = Babel(app)
 from app.errors import bp as errors_bp
 app.register_blueprint(errors_bp)
 
-login.login_view = 'login'
+from app.auth import bp as auth_bp
+app.register_blueprint(auth_bp, url_prefix='/auth')
+
+login.login_view = 'auth.login'
 login.login_message = _l('Please log in to access this page.')
 
 with app.app_context():
@@ -55,8 +58,8 @@ if not app.debug:
     app.logger.setLevel(logging.INFO)
     app.logger.info('Microblog startup.')
 
-    mail_server = app.config['MAIL_SERVER']  # Google no longer allows 'less secure apps' to use mail accounts directly
-    if mail_server:
+    mail_server = app.config['MAIL_SERVER']
+    if mail_server and app.config.get('ERROR_MAIL'):
         auth = None
         if app.config['MAIL_USERNAME'] or app.config['MAIL_PASSWORD']:
             auth = (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])

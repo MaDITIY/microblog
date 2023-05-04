@@ -10,21 +10,13 @@ from flask import url_for
 from flask_babel import _
 from flask_login import current_user
 from flask_login import login_required
-from flask_login import login_user
-from flask_login import logout_user
 from guess_language import guess_language
-from werkzeug.urls import url_parse
 
 from app import app
 from app import db
-from app.email import send_password_reset_email
 from app.forms import EditProfileForm
 from app.forms import EmptyForm
-from app.forms import LoginForm
 from app.forms import PostForm
-from app.forms import RegistrationForm
-from app.forms import ResetPasswordForm
-from app.forms import ResetPasswordRequestForm
 from app.models import Post
 from app.models import User
 from app.translate import translate
@@ -102,45 +94,6 @@ def explore():
     )
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = LoginForm()
-    if form.validate_on_submit():
-        user_instance = User.query.filter_by(username=form.username.data).first()
-        if user_instance is None or not user_instance.check_password(form.password.data):
-            flash('Invalid username or password')
-            return redirect(url_for('login'))
-        login_user(user_instance, remember=form.remember_me.data)
-        next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('index')
-        return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form)
-
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user_instance = User(username=form.username.data, email=form.email.data)
-        user_instance.set_password(form.password.data)
-        db.session.add(user_instance)
-        db.session.commit()
-        flash("Congratulations, you're now registered!")
-        return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
-
-
 @app.route('/user/<username>')
 @login_required
 def user(username):
@@ -191,7 +144,7 @@ def follow(username):
         flash(_('User %(username)s not found', username=username))
         return redirect(url_for('index'))
     if user_instance == current_user:
-        flash(f'You can\'t follow yourself!')
+        flash('You can\'t follow yourself!')
         return redirect(url_for('user', username=username))
     current_user.follow(user_instance)
     db.session.commit()
@@ -207,42 +160,12 @@ def unfollow(username):
         flash(f'User {username} not found')
         return redirect(url_for('index'))
     if user_instance == current_user:
-        flash(f'You can\'t unfollow yourself!')
+        flash('You can\'t unfollow yourself!')
         return redirect(url_for('user', username=username))
     current_user.unfollow(user_instance)
     db.session.commit()
     flash(f'You don\'t follow {username} anymore.')
     return redirect(url_for('user', username=username))
-
-
-@app.route('/reset_password_request', methods=['GET', 'POST'])
-def reset_password_request():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = ResetPasswordRequestForm()
-    if form.validate_on_submit():
-        user_instance = User.query.filter_by(email=form.email.data).first()
-        if user:
-            send_password_reset_email(user_instance)
-        flash('Check your email for the instructions to reset your password.')
-        return redirect(url_for('login'))
-    return render_template('reset_password_request.html', title='Reset Password', form=form)
-
-
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    user_instance = User.verify_reset_password_token(token)
-    if not user_instance:
-        return redirect(url_for('index'))
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
-        user_instance.set_password(form.password.data)
-        db.session.commit()
-        flash('Your password successfully reset.')
-        return redirect(url_for('login'))
-    return render_template('reset_password.html', form=form)
 
 
 @app.route('/translate', methods=['POST'])
