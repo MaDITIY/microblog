@@ -27,6 +27,9 @@ bootstrap = Bootstrap(app)
 moment = Moment(app)
 babel = Babel(app)
 
+from app.errors import bp as errors_bp
+app.register_blueprint(errors_bp)
+
 login.login_view = 'login'
 login.login_message = _l('Please log in to access this page.')
 
@@ -71,4 +74,4 @@ if not app.debug:
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
 
-from app import errors, routes, models
+from app import routes, models
