@@ -91,7 +91,7 @@ def create_app(config_obj=Config):
             mail_handler.setLevel(logging.ERROR)
             app.logger.addHandler(mail_handler)
       
-        return app
+    return app
 
 
 @babel.localeselector

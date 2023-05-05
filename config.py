@@ -18,7 +18,7 @@ TEST_DB_URI = 'sqlite://'
 
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'super-secret-key'
-    TESTING = int(os.environ.get('TESTING_MODE', '0'))
+    TESTING = int(os.environ.get('TESTING', '0'))
     SQLALCHEMY_DATABASE_URI = TEST_DB_URI if TESTING else DEV_DB_URI
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

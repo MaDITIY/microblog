@@ -4,17 +4,24 @@ from datetime import timedelta
 from unittest import main
 from unittest import TestCase
 
-from app import app
 from app import db
+from app import create_app
 from app.models import Post
 from app.models import User
+from config import Config
 
+
+class TestConfig(Config):
+    """Config class for testing purpouses"""
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite://'
 
 class TestUser(TestCase):
     """Test class to test User model."""
     def setUp(self) -> None:
         """Class setup."""
-        self.app_context = app.app_context()
+        self.app = create_app(TestConfig)
+        self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
 
@@ -78,10 +85,14 @@ class TestUser(TestCase):
         db.session.add_all([user1, user2, user3, user4])
 
         now = datetime.utcnow()
-        post1 = Post(body='john post', author=user1, timestamp=now + timedelta(seconds=1))
-        post2 = Post(body='susan post', author=user2, timestamp=now + timedelta(seconds=4))
-        post3 = Post(body='mary post', author=user3, timestamp=now + timedelta(seconds=3))
-        post4 = Post(body='david post', author=user4, timestamp=now + timedelta(seconds=2))
+        post1 = Post(
+            body='john post', author=user1, timestamp=now + timedelta(seconds=1))
+        post2 = Post(
+            body='susan post', author=user2, timestamp=now + timedelta(seconds=4))
+        post3 = Post(
+            body='mary post', author=user3, timestamp=now + timedelta(seconds=3))
+        post4 = Post(
+            body='david post', author=user4, timestamp=now + timedelta(seconds=2))
         db.session.add_all([post1, post2, post3, post4])
         db.session.commit()
 
