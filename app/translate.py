@@ -1,19 +1,21 @@
 import requests
 import uuid
 
+from flask import current_app
 from flask_babel import _
-
-from app import app
 
 
 def translate(text, source_language, dest_language):
     """Translate text using MS Translator API"""
     # TODO: Implement env variable to encapsulate translator API to direct methods.
-    if 'MS_TRANSLATOR_KEY' not in app.config or not app.config['MS_TRANSLATOR_KEY']:
+    if (
+        'MS_TRANSLATOR_KEY' not in current_app.config or 
+        not current_app.config['MS_TRANSLATOR_KEY']
+    ):
         return _('Error: the translator service is not configured.')
     auth = {
-        'Ocp-Apim-Subscription-Key': app.config['MS_TRANSLATOR_KEY'],
-        'Ocp-Apim-Subscription-Region': app.config['MS_TRANSLATOR_LOCATION'],
+        'Ocp-Apim-Subscription-Key': current_app.config['MS_TRANSLATOR_KEY'],
+        'Ocp-Apim-Subscription-Region': current_app.config['MS_TRANSLATOR_LOCATION'],
         'Content-type': 'application/json',
         'X-ClientTraceId': str(uuid.uuid4())
     }
@@ -26,7 +28,7 @@ def translate(text, source_language, dest_language):
         'text': text
     }]
     response = requests.post(
-        f'https://api.cognitive.microsofttranslator.com/translate',
+        'https://api.cognitive.microsofttranslator.com/translate',
         headers=auth,
         params=params,
         json=body,
