@@ -22,7 +22,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = TEST_DB_URI if TESTING else DEV_DB_URI
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    MAX_POSTS_PER_PAGE = 10
+    POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE', 5))
 
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)

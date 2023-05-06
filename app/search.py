@@ -8,7 +8,7 @@ def add_to_index(index: str, model: db.Model) -> None:
     if not current_app.elasticsearch:
         return
     payload = {}
-    for field in model.__fulltext_attrs:
+    for field in model._fulltext_attrs:
         payload[field] = getattr(model, field)
     current_app.elasticsearch.index(index=index, id=model.id, body=payload)
 
@@ -41,4 +41,4 @@ def query_index(
     )
     search_hits = search['hits']
     ids = [int(hit['_id']) for hit in search_hits['hits']]
-    return ids, search_hits['total']
+    return ids, search_hits['total']['value']

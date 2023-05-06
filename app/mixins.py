@@ -26,7 +26,7 @@ class Searchable:
             case_when_condition.append((ids[i], i))
         result_objects = cls.query.filter(
             cls.id.in_(ids)
-        ).order_by(db.case(case_when_condition, value=cls.id))
+        ).order_by(db.case(*case_when_condition, value=cls.id))
         return result_objects, total
 
     

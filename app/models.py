@@ -23,8 +23,6 @@ class User(db.Model, UserMixin):
     """User model representing app user entity."""
     __tablename__ = 'users'
 
-    __fulltext_attrs = ['body']
-
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
@@ -115,6 +113,8 @@ def load_user(user_id: str) -> User:
 class Post(db.Model, Searchable):
     """Post model representing users posts."""
     __tablename__ = 'posts'
+
+    _fulltext_attrs = ['body']
 
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(140))
