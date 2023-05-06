@@ -9,6 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
 from app import login
+from app.mixins import Searchable
 
 
 followers = db.Table(
@@ -21,6 +22,8 @@ followers = db.Table(
 class User(db.Model, UserMixin):
     """User model representing app user entity."""
     __tablename__ = 'users'
+
+    __fulltext_attrs = ['body']
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
@@ -109,7 +112,7 @@ def load_user(user_id: str) -> User:
     return User.query.get(int(user_id))
 
 
-class Post(db.Model):
+class Post(db.Model, Searchable):
     """Post model representing users posts."""
     __tablename__ = 'posts'
 
@@ -119,5 +122,6 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     language = db.Column(db.String(10))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """Return Post representation."""
         return f'<Post {self.body}>'

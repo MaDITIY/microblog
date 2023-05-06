@@ -35,3 +35,5 @@ class Config(object):
     LANGUAGES = ['en', 'ru', 'by']
     MS_TRANSLATOR_KEY = os.environ.get('MS_TRANSLATOR_KEY')
     MS_TRANSLATOR_LOCATION = os.environ.get('MS_TRANSLATOR_LOCATION')
+
+    ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
