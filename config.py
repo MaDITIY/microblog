@@ -32,8 +32,10 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = os.environ.get('ADMINS', ['microblog235@gmail.com'])
 
-    LANGUAGES = os.environ.get('LANGUAGES').split(',') or ['en', 'ru', 'by']
+    LANGUAGES = os.environ.get('LANGUAGES', '').split(',') or ['en', 'ru', 'by']
     MS_TRANSLATOR_KEY = os.environ.get('MS_TRANSLATOR_KEY')
     MS_TRANSLATOR_LOCATION = os.environ.get('MS_TRANSLATOR_LOCATION')
 
     ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
+
+    LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')

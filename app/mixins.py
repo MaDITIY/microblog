@@ -29,7 +29,6 @@ class Searchable:
         ).order_by(db.case(*case_when_condition, value=cls.id))
         return result_objects, total
 
-    
     @classmethod
     def before_commit(cls, session: Session) -> None:
         """Store before commit session state."""
@@ -39,7 +38,6 @@ class Searchable:
             'delete': list(session.deleted)
         }
 
-    
     @classmethod
     def after_commit(cls, session: Session) -> None:
         """Perform search engine DB update upon app DB changes."""
