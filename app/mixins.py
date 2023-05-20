@@ -41,6 +41,7 @@ class Searchable:
     @classmethod
     def after_commit(cls, session: Session) -> None:
         """Perform search engine DB update upon app DB changes."""
+        # TODO: Add index error handling.
         for obj in session._changes['add'] + session._changes['update']:
             if isinstance(obj, Searchable):
                 add_to_index(obj.__tablename__, obj)
