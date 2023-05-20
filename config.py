@@ -11,7 +11,7 @@ rdms_name_uri_map = {
     'sqlite': sqlite_uri,
 }
 
-RDMS_NAME = os.environ.get('RDMS_NAME', 'postgresql')
+RDMS_NAME = os.environ.get('RDMS_NAME', 'sqlite')
 DEV_DB_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') or rdms_name_uri_map[RDMS_NAME]
 TEST_DB_URI = 'sqlite://'
 
