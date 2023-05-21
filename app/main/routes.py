@@ -38,6 +38,14 @@ def before_request():
         g.search_form = SearchForm()
 
 
+@bp.route("/admin/reindex")
+@login_required
+def reindex():
+    Post.reindex()
+    flash(_("Reindex done."))
+    return redirect(url_for("main.index"))
+
+
 @bp.route("/", methods=["GET", "POST"])
 @bp.route("/index", methods=["GET", "POST"])
 @login_required
