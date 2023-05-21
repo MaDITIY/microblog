@@ -149,6 +149,13 @@ def user(username):
     )
 
 
+@bp.route("/user/<username>/popup")
+@login_required
+def user_popup(username):
+    user_instance = User.query.filter_by(username=username).first_or_404()
+    return render_template('user_popup.html', user=user_instance)
+
+
 @bp.route("/edit_profile", methods=["GET", "POST"])
 @login_required
 def edit_profile():
@@ -165,7 +172,7 @@ def edit_profile():
     return render_template("edit_profile.html", title="Edit Profile", form=form)
 
 
-@bp.route("/follow/<username>", methods=["POST"])
+@bp.route("/follow/<username>", methods=["GET", "POST"])
 @login_required
 def follow(username):
     user_instance = User.query.filter_by(username=username).first()
@@ -181,7 +188,7 @@ def follow(username):
     return redirect(url_for("main.user", username=username))
 
 
-@bp.route("/unfollow/<username>", methods=["POST"])
+@bp.route("/unfollow/<username>", methods=["GET", "POST"])
 @login_required
 def unfollow(username):
     user_instance = User.query.filter_by(username=username).first()
