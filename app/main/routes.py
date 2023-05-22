@@ -259,3 +259,33 @@ def send_message(recipient):
         form=form,
         recipient=recipient,
     )
+
+
+@bp.route('/messages')
+@login_required
+def messages():
+    current_user.last_message_read_time = datetime.utcnow()
+    db.session.commit()
+    page = request.args.get('page', 1, type=int)
+    messages_paginator = current_user.messages_received.order_by(
+        Message.timestamp.desc()
+    ).paginate(
+        page=page,
+        max_per_page=current_app.config["POSTS_PER_PAGE"],
+        error_out=False,
+    )
+    next_page_url = (
+        url_for("main.messages", page=messages_paginator.next_num)
+        if messages_paginator.has_next else None
+    )
+    prev_page_url = (
+        url_for("main.messages", page=messages_paginator.prev_num)
+        if messages_paginator.has_prev else None
+    )
+    messages_list = messages_paginator.items
+    return render_template(
+        "messages.html",
+        messages=messages_list,
+        next_page_url=next_page_url,
+        prev_page_url=prev_page_url,
+    )
