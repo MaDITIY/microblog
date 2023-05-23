@@ -5,6 +5,10 @@ from app.models import Post
 from app.models import User
 
 
+# General App TODOs:
+# TODO: Move pagination footer to a subtemplate.
+
+
 app = create_app()
 cli.register(app)
 

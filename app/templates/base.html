@@ -99,6 +99,10 @@
                     <li>
                         <a href="{{ url_for('main.messages') }}">
                             {{ _('Messages') }}
+                            {% set new_messages_count = current_user.new_messages_count() %}
+                            {% if new_messages_count %}
+                                <span class="badge">{{ new_messages_count }}</span>
+                            {% endif %}
                         </a>
                     </li>
                     <li><a href="{{ url_for('main.user', username=current_user.username) }}">Profile</a></li>
