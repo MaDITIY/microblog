@@ -22,12 +22,14 @@ from app.main.forms import MessageForm
 from app.main.forms import PostForm
 from app.main.forms import SearchForm
 from app.models import Message
+from app.models import Notification
 from app.models import Post
 from app.models import User
 from app.translate import translate
 
 
-UNKNOWN_LANGUAGE = "UNKNOWN"
+UNKNOWN_LANGUAGE = 'UNKNOWN'
+UNREAD_MSG_COUNT_NOTIF = 'unread_message_count'
 MAX_LANGUAGE_LEN = 10
 
 
@@ -250,6 +252,10 @@ def send_message(recipient):
             body=form.message.data,
         )
         db.session.add(msg)
+        user_instance.add_notification(
+            UNREAD_MSG_COUNT_NOTIF,
+            user_instance.new_messages_count(),
+        )
         db.session.commit()
         flash(_('Your message has been sent.'))
         return redirect(url_for('main.user', username=recipient))
@@ -265,6 +271,7 @@ def send_message(recipient):
 @login_required
 def messages():
     current_user.last_message_read_time = datetime.utcnow()
+    current_user.add_notification(UNREAD_MSG_COUNT_NOTIF, 0)
     db.session.commit()
     page = request.args.get('page', 1, type=int)
     messages_paginator = current_user.messages_received.order_by(
@@ -289,3 +296,17 @@ def messages():
         next_page_url=next_page_url,
         prev_page_url=prev_page_url,
     )
+
+
+@bp.route('/notifications')
+@login_required
+def notifications():
+    since = request.args.get('since', 0.0, type=float)
+    notifs = current_user.notifications.filter(
+        Notification.timestamp > since
+    ).order_by(Notification.timestamp.asc())
+    return jsonify([{
+        'name': notification.name,
+        'data': notification.get_data(),
+        'timestamp': notification.timestamp,
+    } for notification in notifs])

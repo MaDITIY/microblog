@@ -1,6 +1,8 @@
 from datetime import datetime
 from time import time
+from typing import Any
 from hashlib import md5
+import json
 
 import jwt
 from flask import current_app
@@ -51,6 +53,11 @@ class User(db.Model, UserMixin):
         lazy='dynamic',
     )
     last_message_read_time = db.Column(db.DateTime)
+    notifications = db.relationship(
+        'Notification',
+        backref='user',
+        lazy='dynamic',
+    )
 
     def __repr__(self) -> str:
         """User model string representation."""
@@ -117,12 +124,19 @@ class User(db.Model, UserMixin):
             return
         return User.query.get(user_id)
 
+    # TODO: could be a property instead?
     def new_messages_count(self) -> int:
         """Gather unread messages."""
         last_read_time = self.last_message_read_time or datetime(1900, 1, 1)
         return Message.query.filter_by(recipient=self).filter(
             Message.timestamp > last_read_time
         ).count()
+
+    def add_notification(self, name: str, data: Any) -> None:
+        """Add new notification for a self User."""
+        self.notifications.filter_by(name=name).delete()
+        notif = Notification(name=name, payload_json=json.dumps(data), user=self)
+        db.session.add(notif)
 
 
 @login.user_loader
@@ -162,3 +176,17 @@ class Message(db.Model):
         """Message object str representation."""
         return f'<Message {self.body}>'
 
+
+class Notification(db.Model):
+    """Class for representation of user notification."""
+    __tablename__ = 'notifications'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    timestamp = db.Column(db.Float, index=True, default=time)
+    payload_json = db.Column(db.Text)
+
+    def get_data(self) -> dict:
+        """Get notification payload."""
+        return json.loads(str(self.payload_json))
