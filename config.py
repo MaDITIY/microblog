@@ -22,6 +22,8 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = TEST_DB_URI if TESTING else DEV_DB_URI
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'
+
     POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE', 5))
 
     MAIL_SERVER = os.environ.get('MAIL_SERVER')

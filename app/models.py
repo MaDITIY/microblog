@@ -60,7 +60,7 @@ class User(db.Model, UserMixin):
         backref='user',
         lazy='dynamic',
     )
-    task = db.relationship('Task', backref='user', lazy='dynamic')
+    tasks = db.relationship('Task', backref='user', lazy='dynamic')
 
     def __repr__(self) -> str:
         """User model string representation."""
@@ -140,6 +140,27 @@ class User(db.Model, UserMixin):
         self.notifications.filter_by(name=name).delete()
         notif = Notification(name=name, payload_json=json.dumps(data), user=self)
         db.session.add(notif)
+
+    def launch_task(
+            self, name: str, description: str, *args: list, **kwargs: dict
+    ) -> 'Task':
+        """Launch background task linked to self user."""
+        rq_job = current_app.task_queue.enqueue(
+            f'app.tasks.{name}',
+            self.id,
+            *args, **kwargs
+        )
+        task = Task(id=rq_job.get_id(), name=name, description=description, user=self)
+        db.session.add(task)
+        return task
+
+    def get_tasks_in_progress(self) -> list:
+        """Get self tasks which are in progress."""
+        return Task.query.filter_by(user=self, complete=False).all()
+
+    def get_task_in_progress(self, name: str) -> 'Task':
+        """Get self in progress task by name."""
+        return Task.query.filter_by(name=name, user=self, complete=False).first()
 
 
 @login.user_loader
