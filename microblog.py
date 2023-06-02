@@ -1,9 +1,10 @@
-from app import create_app
 from app import cli
+from app import create_app
 from app import db
 from app.models import Message
 from app.models import Notification
 from app.models import Post
+from app.models import Task
 from app.models import User
 
 
@@ -23,4 +24,5 @@ def make_shell_context():
         'Post': Post,
         'Message': Message,
         'Notification': Notification,
+        'Task': Task,
     }

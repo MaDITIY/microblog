@@ -1,12 +1,14 @@
 from datetime import datetime
 from time import time
-from typing import Any
+from typing import Any, Optional
 from hashlib import md5
 import json
 
-import jwt
 from flask import current_app
 from flask_login import UserMixin
+import jwt
+import redis
+import rq
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
@@ -58,6 +60,7 @@ class User(db.Model, UserMixin):
         backref='user',
         lazy='dynamic',
     )
+    task = db.relationship('Task', backref='user', lazy='dynamic')
 
     def __repr__(self) -> str:
         """User model string representation."""
@@ -190,3 +193,26 @@ class Notification(db.Model):
     def get_data(self) -> dict:
         """Get notification payload."""
         return json.loads(str(self.payload_json))
+
+
+class Task(db.Model):
+    __tablename__ = 'tasks'
+
+    id = db.Column(db.String(36), primary_key=True)
+    name = db.Column(db.String(128), index=True)
+    description = db.Column(db.String(128))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    complete = db.Column(db.Boolean, default=False)
+
+    def get_rq_job(self) -> Optional[rq.job.Job]:
+        """Get Redis Queue job by its ID."""
+        try:
+            rq_job = rq.job.Job.fetch(self.id, connection=current_app.redis)
+        except (redis.exceptions.RedisError, rq.exceptions.NoSuchJobError):
+            return None
+        return rq_job
+
+    def get_progress(self) -> int:
+        """Get RQ job progress percentage."""
+        job = self.get_rq_job()
+        return job.meta.get('progress', 0) if job is not None else 100
