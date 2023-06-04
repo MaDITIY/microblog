@@ -14,7 +14,7 @@ def send_email(
         text_body: str,
         html_body: str,
         attachments: Iterable = tuple(),
-        send_async: bool = False,
+        send_async: bool = True,
 ) -> None:
     """Start a new thread to send email."""
     msg = Message(subject, sender=sender, recipients=recipients)
