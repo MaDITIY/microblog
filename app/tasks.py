@@ -31,6 +31,7 @@ def _set_task_progress(progress: int) -> None:
                 'progress': progress,
             }
         )
+        app.logger.info(f'Completeness percentage: {progress}')
 
         if progress >= 100:
             task.complete = True
@@ -68,6 +69,7 @@ def export_posts(user_id):
             )],
             send_async=False,
         )
+        app.logger.info('Result mail send successfully.')
     except:
         _set_task_progress(100)
         app.logger.error('Unhandled exception', exc_info=sys.exc_info())
