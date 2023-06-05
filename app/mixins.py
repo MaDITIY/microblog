@@ -1,4 +1,7 @@
+from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.session import Session
+
+from flask import url_for
 
 from app import db
 from app.search import add_to_index
@@ -54,6 +57,41 @@ class Searchable:
         """Perporm model reindexing."""
         for obj in cls.query:
             add_to_index(cls.__tablename__, obj)
+
+
+class PaginatedAPI:
+    """Allows to represent paginated instance query via API."""
+    @staticmethod
+    def to_collection_dict(
+            query: Query,
+            page: int,
+            per_page: int,
+            endpoint: str,
+            **kwargs: dict
+    ) -> dict:
+        """Build a representation of collection of instances."""
+        resources = query.paginate(page, per_page, False)
+        data = {
+            'items': [item.to_dict() for item in resources.items],
+            '_meta': {
+                'page': page,
+                'per_page': per_page,
+                'total_pages': resources.pages,
+                'total_items': resources.total
+            },
+            '_links': {
+                'self': url_for(
+                    endpoint, page=page, per_page=per_page, **kwargs
+                ),
+                'next': url_for(
+                    endpoint, page=page + 1, per_page=per_page, **kwargs
+                ) if resources.has_next else None,
+                'prev': url_for(
+                    endpoint, page=page - 1, per_page=per_page, **kwargs
+                ) if resources.has_prev else None
+            }
+        }
+        return data
 
 
 db.event.listen(db.session, 'before_commit', Searchable.before_commit)

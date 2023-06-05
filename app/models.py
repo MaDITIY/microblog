@@ -5,6 +5,7 @@ from hashlib import md5
 import json
 
 from flask import current_app
+from flask import url_for
 from flask_login import UserMixin
 import jwt
 import redis
@@ -13,6 +14,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
 from app import login
+from app.mixins import PaginatedAPI
 from app.mixins import Searchable
 
 
@@ -23,7 +25,7 @@ followers = db.Table(
 )
 
 
-class User(db.Model, UserMixin):
+class User(db.Model, UserMixin, PaginatedAPI):
     """User model representing app user entity."""
     __tablename__ = 'users'
 
@@ -161,6 +163,35 @@ class User(db.Model, UserMixin):
     def get_task_in_progress(self, name: str) -> 'Task':
         """Get self in progress task by name."""
         return Task.query.filter_by(name=name, user=self, complete=False).first()
+
+    def to_dict(self, include_email: bool = False) -> dict:
+        """Build dict representation of User model"""
+        data = {
+            'id': self.id,
+            'username': self.username,
+            'last_seen': f'{self.last_seen.isoformat()}Z',
+            'about_me': self.about_me,
+            'post_count': self.posts.count(),
+            'follower_count': self.followers.count(),
+            'followed_count': self.followed.count(),
+            '_links': {
+                'self': url_for('api.v1.get_user', id=self.id),
+                'followers': url_for('api.v1.get_followers', id=self.id),
+                'followed': url_for('api.v1.get_followed', id=self.id),
+                'avatar': self.avatar(128)
+            }
+        }
+        if include_email:
+            data['email'] = self.email
+        return data
+
+    def from_dict(self, data: dict, new_user: bool = False) -> None:
+        """Method to create/update User instance from dict."""
+        for field in ['username', 'email', 'about_me']:
+            if field in data:
+                setattr(self, field, data[field])
+        if new_user and 'password' in data:
+            self.set_password(data['password'])
 
 
 @login.user_loader
