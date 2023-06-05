@@ -53,7 +53,7 @@ def export_posts(user_id):
                 'body': post.body,
                 'timestamp': f'{post.timestamp.isoformat()}Z',
             })
-            time.sleep(5)
+            time.sleep(3)
             _set_task_progress(100 * i // total_posts)
 
         send_email(
