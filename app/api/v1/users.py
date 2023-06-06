@@ -1,9 +1,13 @@
+from flask import jsonify
+
 from app.api.v1 import bp
+from app.models import User
 
 
 @bp.route('/users/<int:id>', methods=['GET'])
 def get_user(id):
-    pass
+    user_dict = User.query.get_or_404(id).to_dict()
+    return jsonify(user_dict)
 
 
 @bp.route('/users', methods=['GET'])
