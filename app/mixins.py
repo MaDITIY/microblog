@@ -70,7 +70,11 @@ class PaginatedAPI:
             **kwargs: dict
     ) -> dict:
         """Build a representation of collection of instances."""
-        resources = query.paginate(page, per_page, False)
+        resources = query.paginate(
+            page=page,
+            max_per_page=per_page,
+            error_out=False,
+        )
         data = {
             'items': [item.to_dict() for item in resources.items],
             '_meta': {
