@@ -1,5 +1,6 @@
 from flask import g
 from flask_httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPTokenAuth
 from flask.wrappers import Response
 
 from app.models import User
@@ -7,6 +8,7 @@ from app.api.v1.errors import error_response
 
 
 basic_auth = HTTPBasicAuth()
+token_auth = HTTPTokenAuth()
 
 
 @basic_auth.verify_password
@@ -19,7 +21,15 @@ def verify_password(username: str, password: str) -> True:
     return user.check_password(password)
 
 
+@token_auth.verify_token
+def verify_token(token: str) -> bool:
+    """Verify given user auth token."""
+    g.current_user = User.check_token(token) if token else None
+    return g.current_user is not None
+
+
 @basic_auth.error_handler
-def basic_auth_error() -> Response:
+@token_auth.error_handler
+def auth_error_handler() -> Response:
     """Handle auth error."""
     return error_response(401)

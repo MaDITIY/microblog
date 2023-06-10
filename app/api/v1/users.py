@@ -4,6 +4,7 @@ from flask import url_for
 
 from app import db
 from app.api.v1 import bp
+from app.api.v1.auth import token_auth
 from app.api.v1.errors import bad_request
 from app.models import User
 
@@ -18,6 +19,7 @@ USER_CREATE_MANDATORY_FIELDS = {
 
 
 @bp.route('/users/<int:id>', methods=['GET'])
+@token_auth.login_required
 def get_user(id):
     """Get single user by ID."""
     user_dict = User.query.get_or_404(id).to_dict()
@@ -25,6 +27,7 @@ def get_user(id):
 
 
 @bp.route('/users', methods=['GET'])
+@token_auth.login_required
 def get_users():
     """Get all application users."""
     page = request.args.get('page', 1, type=int)
@@ -39,6 +42,7 @@ def get_users():
 
 
 @bp.route('/users/<int:id>/followers', methods=['GET'])
+@token_auth.login_required
 def get_followers(id):
     """Get User followers by user ID."""
     user = User.query.get_or_404(id)
@@ -51,6 +55,7 @@ def get_followers(id):
 
 
 @bp.route('/users/<int:id>/followed', methods=['GET'])
+@token_auth.login_required
 def get_followed(id):
     """Get User followed by user ID."""
     user = User.query.get_or_404(id)
@@ -86,6 +91,7 @@ def create_user():
 
 
 @bp.route('/users/<int:id>', methods=['PUT'])
+@token_auth.login_required
 def update_user(id):
     """Update existing user by its ID."""
     user = User.query.get_or_404(id)
