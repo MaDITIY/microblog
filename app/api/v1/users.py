@@ -10,11 +10,11 @@ from app.models import User
 
 MAX_COLLECTIONS_COUNT = 100
 
-USER_CREATE_MANDATORY_FIELDS = (
+USER_CREATE_MANDATORY_FIELDS = {
     'username',
     'email',
     'password',
-)
+}
 
 
 @bp.route('/users/<int:id>', methods=['GET'])
@@ -66,8 +66,11 @@ def get_followed(id):
 def create_user():
     """Register new user profile."""
     data = request.get_json() or {}
-    if 'username' not in data or 'email' not in data or 'password' not in data:
-        return bad_request('One of mandatory fields is missing.')
+    request_fields = set(data)
+    if missed_keys := USER_CREATE_MANDATORY_FIELDS - request_fields:
+        return bad_request(
+            f'Missing mandatory fields. Please fill the following keys: {missed_keys}.'
+        )
     if User.query.filter_by(username=data['username']).first():
         return bad_request('This username is already in use.')
     if User.query.filter_by(email=data['email']).first():
