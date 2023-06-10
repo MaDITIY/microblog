@@ -1,4 +1,7 @@
+import base64
 from datetime import datetime
+from datetime import timedelta
+import os
 from time import time
 from typing import Any, Optional
 from hashlib import md5
@@ -63,6 +66,8 @@ class User(db.Model, UserMixin, PaginatedAPI):
         lazy='dynamic',
     )
     tasks = db.relationship('Task', backref='user', lazy='dynamic')
+    token = db.Column(db.String(32), index=True, unique=True)
+    token_expiration = db.Column(db.DateTime)
 
     def __repr__(self) -> str:
         """User model string representation."""
@@ -192,6 +197,28 @@ class User(db.Model, UserMixin, PaginatedAPI):
                 setattr(self, field, data[field])
         if new_user and 'password' in data:
             self.set_password(data['password'])
+
+    def get_token(self, expires_in: int = 3600) -> str:
+        """Get auth token."""
+        now = datetime.utcnow()
+        if self.token and self.token_expiration > now + timedelta(seconds=60):
+            return self.token
+        self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
+        self.token_expiration = now + timedelta(seconds=expires_in)
+        db.session.add(self)
+        return self.token
+
+    def revoke_token(self) -> None:
+        """Revoke user auth token."""
+        self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
+
+    @staticmethod
+    def check_token(token: str) -> Optional['User']:
+        """Check user token."""
+        user = User.query.filter_by(token=token).first()
+        if user is None or user.token_expiration < datetime.utcnow():
+            return None
+        return user
 
 
 @login.user_loader
