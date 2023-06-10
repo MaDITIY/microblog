@@ -4,6 +4,7 @@ from flask import jsonify
 from app import db
 from app.api.v1 import bp
 from app.api.v1.auth import basic_auth
+from app.api.v1.auth import token_auth
 
 
 @bp.route('/tokens', methods=['POST'])
@@ -15,5 +16,10 @@ def get_token():
     return jsonify({'token': token})
 
 
-def revoke_token():
-    pass
+@bp.route('/tokens', methods=['DELETE'])
+@token_auth.login_required
+def revoke_token() -> tuple:
+    """Revoke current user token."""
+    g.current_user.revoke_token()
+    db.session.commit()
+    return '', 204
