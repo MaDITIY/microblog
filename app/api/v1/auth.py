@@ -1,7 +1,7 @@
 from flask import g
 from flask_httpauth import HTTPBasicAuth
 from flask_httpauth import HTTPTokenAuth
-from flask.wrappers import Response
+from flask.typing import ResponseReturnValue
 
 from app.models import User
 from app.api.v1.errors import error_response
@@ -30,6 +30,6 @@ def verify_token(token: str) -> bool:
 
 @basic_auth.error_handler
 @token_auth.error_handler
-def auth_error_handler() -> Response:
+def auth_error_handler() -> ResponseReturnValue:
     """Handle auth error."""
     return error_response(401)

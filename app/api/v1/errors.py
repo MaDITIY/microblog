@@ -1,11 +1,11 @@
 from flask import jsonify
-from flask.wrappers import Response
+from flask.typing import ResponseReturnValue
 from werkzeug.http import HTTP_STATUS_CODES
 
 from app.api.v1 import bp
 
 
-def error_response(status_code: int, message: str = None) -> Response:
+def error_response(status_code: int, message: str = None) -> ResponseReturnValue:
     payload = {'error': HTTP_STATUS_CODES.get(status_code, 'Unknown error')}
     if message:
         payload['message'] = message
@@ -14,5 +14,5 @@ def error_response(status_code: int, message: str = None) -> Response:
     return response
 
 
-def bad_request(message: str) -> Response:
+def bad_request(message: str) -> ResponseReturnValue:
     return error_response(400, message)
