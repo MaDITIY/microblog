@@ -2,6 +2,7 @@ from threading import Thread
 from typing import Iterable
 
 from flask import current_app
+from flask import Flask
 from flask_mail import Message
 
 from app import mail
@@ -31,7 +32,7 @@ def send_email(
         mail.send(msg)
 
 
-def send_async_email(app, msg):
+def send_async_email(app: Flask, msg: Message) -> None:
     """Send email."""
     with app.app_context():
         mail.send(msg)

@@ -21,7 +21,6 @@ def add_to_index(index: str, model: db.Model) -> None:
         current_app.logger.error('Search index "%s" not found.', index)
         
 
-
 def remove_from_index(index: str, model: db.Model) -> None:
     """Remove given index from search engine."""
     if not current_app.elasticsearch:

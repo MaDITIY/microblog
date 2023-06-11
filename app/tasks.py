@@ -39,7 +39,7 @@ def _set_task_progress(progress: int) -> None:
         db.session.commit()
 
 
-def export_posts(user_id):
+def export_posts(user_id: int) -> None:
     """Export all user posts to JSON and send mail result."""
     try:
         user = User.query.get(user_id)
