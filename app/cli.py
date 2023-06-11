@@ -1,17 +1,19 @@
 import os
 import click
 
+from flask import Flask
 
-def register(app):
+
+def register(app: Flask):
     """Register CLI commands in given application."""
     @app.cli.group()
-    def translate():
+    def translate() -> None:
         """Translation and localization commands."""
         pass
 
     @translate.command()
     @click.argument('lang')
-    def init(lang):
+    def init(lang: str) -> None:
         """Initialize a new language"""
         if os.system('pybabel extract -F babel.cfg -k _l -o messages.pot .'):
             raise RuntimeError('Extract command failed.')
@@ -20,7 +22,7 @@ def register(app):
         os.remove('messages.pot')
 
     @translate.command()
-    def update():
+    def update() -> None:
         """Update all languages."""
         if os.system('pybabel extract -F babel.cfg -k _l -o messages.pot .'):
             raise RuntimeError('Extract command failed.')
@@ -29,7 +31,7 @@ def register(app):
         os.remove('messages.pot')
 
     @translate.command()
-    def compile():
+    def compile() -> None:
         """Compile all languages."""
         if os.system('pybabel compile -d app/translations'):
             raise RuntimeError('Compile command failed.')

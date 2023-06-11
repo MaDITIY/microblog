@@ -33,7 +33,7 @@ moment = Moment()
 babel = Babel()
 
 
-def create_app(config_obj=Config):
+def create_app(config_obj: object = Config) -> Flask:
     """Factory function to produce application using config."""
     app = Flask(__name__)
     app.config.from_object(config_obj)
@@ -112,7 +112,7 @@ def create_app(config_obj=Config):
 
 
 @babel.localeselector
-def get_locale():
+def get_locale() -> str:
     """Get application locale."""
     locale = request.accept_languages.best_match(current_app.config['LANGUAGES'])
     g.locale = locale
