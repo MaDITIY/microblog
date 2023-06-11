@@ -153,6 +153,8 @@ def user(username):
         posts=posts,
         next_page_url=next_page_url,
         prev_page_url=prev_page_url,
+        next_page_title="Older posts",
+        prev_page_title="Newer posts",
         form=form,
     )
 

@@ -9,7 +9,6 @@ from app.models import User
 
 
 # General App TODOs:
-# TODO: Move pagination footer to a subtemplate.
 # TODO: Introduce dev constants module for BGtasks and notifications names.
 
 
