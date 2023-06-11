@@ -2,8 +2,6 @@ from flask import jsonify
 from flask.typing import ResponseReturnValue
 from werkzeug.http import HTTP_STATUS_CODES
 
-from app.api.v1 import bp
-
 
 def error_response(status_code: int, message: str = None) -> ResponseReturnValue:
     payload = {'error': HTTP_STATUS_CODES.get(status_code, 'Unknown error')}
