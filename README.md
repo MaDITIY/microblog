@@ -85,5 +85,5 @@ MAIL_PASSWORD="<mail-app-password>"
 * PostgreSQL
 * Babel
 * Redis Queue
-* Microsoft Translator
+* Microsoft Azure Cloud: Microsoft Translator
 * Bootstrap
