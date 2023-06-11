@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from typing import Union
 
 from flask import current_app
 from flask import flash
@@ -9,6 +10,7 @@ from flask import render_template
 from flask import redirect
 from flask import request
 from flask import url_for
+from flask.typing import ResponseReturnValue
 from flask_babel import _
 from flask_login import current_user
 from flask_login import login_required
@@ -30,7 +32,7 @@ from app.translate import translate
 
 
 @bp.before_request
-def before_request():
+def before_request() -> None:
     """Before request executions."""
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
@@ -40,7 +42,7 @@ def before_request():
 
 @bp.route("/admin/reindex")
 @login_required
-def reindex():
+def reindex() -> ResponseReturnValue:
     Post.reindex()
     flash(_("Reindex done."))
     return redirect(url_for("main.index"))
@@ -49,7 +51,7 @@ def reindex():
 @bp.route("/", methods=["GET", "POST"])
 @bp.route("/index", methods=["GET", "POST"])
 @login_required
-def index():
+def index() -> Union[str, ResponseReturnValue]:
     form = PostForm()
     if form.validate_on_submit():
         post_body = form.post.data
@@ -95,7 +97,7 @@ def index():
 
 @bp.route("/explore")
 @login_required
-def explore():
+def explore() -> str:
     page = request.args.get("page", 1, type=int)
     posts_paginator = Post.query.order_by(Post.timestamp.desc()).paginate(
         page=page,
@@ -126,7 +128,7 @@ def explore():
 
 @bp.route("/user/<username>")
 @login_required
-def user(username):
+def user(username: str) -> str:
     user_instance = User.query.filter_by(username=username).first_or_404()
     page = request.args.get("page", 1, type=int)
     posts_paginator = user_instance.posts.order_by(Post.timestamp.desc()).paginate(
@@ -160,14 +162,14 @@ def user(username):
 
 @bp.route("/user/<username>/popup")
 @login_required
-def user_popup(username):
+def user_popup(username: str) -> str:
     user_instance = User.query.filter_by(username=username).first_or_404()
     return render_template('user_popup.html', user=user_instance)
 
 
 @bp.route("/edit_profile", methods=["GET", "POST"])
 @login_required
-def edit_profile():
+def edit_profile() -> Union[str, ResponseReturnValue]:
     form = EditProfileForm(current_user.username)
     if form.validate_on_submit():
         current_user.username = form.username.data
@@ -183,7 +185,7 @@ def edit_profile():
 
 @bp.route("/follow/<username>", methods=["GET", "POST"])
 @login_required
-def follow(username):
+def follow(username: str) -> ResponseReturnValue:
     user_instance = User.query.filter_by(username=username).first()
     if user_instance is None:
         flash(_("User %(username)s not found", username=username))
@@ -199,7 +201,7 @@ def follow(username):
 
 @bp.route("/unfollow/<username>", methods=["GET", "POST"])
 @login_required
-def unfollow(username):
+def unfollow(username: str) -> ResponseReturnValue:
     user_instance = User.query.filter_by(username=username).first()
     if user_instance is None:
         flash(f"User {username} not found")
@@ -215,7 +217,7 @@ def unfollow(username):
 
 @bp.route("/translate", methods=["POST"])
 @login_required
-def translate_text():
+def translate_text() -> ResponseReturnValue:
     return jsonify(
         {
             "text": translate(
@@ -229,7 +231,7 @@ def translate_text():
 
 @bp.route('/search')
 @login_required
-def search():
+def search() -> Union[str, ResponseReturnValue]:
     if not g.search_form.validate():
         return redirect(url_for('main.explore'))
     page = request.args.get('page', 1, type=int)
@@ -252,7 +254,7 @@ def search():
 
 @bp.route('/send_message/<recipient>', methods=['GET', 'POST'])
 @login_required
-def send_message(recipient):
+def send_message(recipient: str) -> Union[str, ResponseReturnValue]:
     user_instance = User.query.filter_by(username=recipient).first_or_404()
     form = MessageForm()
     if form.validate_on_submit():
@@ -279,7 +281,7 @@ def send_message(recipient):
 
 @bp.route('/messages')
 @login_required
-def messages():
+def messages() -> str:
     current_user.last_message_read_time = datetime.utcnow()
     current_user.add_notification(constants.UNREAD_MSG_COUNT_NOTIF, 0)
     db.session.commit()
@@ -312,7 +314,7 @@ def messages():
 
 @bp.route('/notifications')
 @login_required
-def notifications():
+def notifications() -> ResponseReturnValue:
     since = request.args.get('since', 0.0, type=float)
     notifs = current_user.notifications.filter(
         Notification.timestamp > since
@@ -326,7 +328,7 @@ def notifications():
 
 @bp.route('/export_posts')
 @login_required
-def export_posts():
+def export_posts() -> ResponseReturnValue:
     if current_user.get_task_in_progress(constants.EXPORT_POSTS_BG):
         flash(_('An export task is currently in progress'))
     else:
