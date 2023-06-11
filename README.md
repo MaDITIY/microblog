@@ -22,16 +22,23 @@ Here is the list of main application features implemented:
 
 ## Quick start
 Getting started with microblog base functionality should be fast and easy. Here are the steps:
-1. Clone this repo: https://github.com/MaDITIY/TerminalCalculator.git
+1. Clone this repo: https://github.com/MaDITIY/microblog.git
 2. Open cloned directory.
 3. Create new virtualenv:
+
 ```python3 -m venv venv```
+
 4. Activate virtualenv:
+
 ```source ./venv/bin/activate```
+
 5. Install packages:
+
 ```pip install -r requirements.txt```
+
 ### Launch microblog
 [From root directory under activated venv. Make sure RDMS running.]
+
 ```flask run --host 0.0.0.0 --port 8080```
 
 ### Accesing microblog
