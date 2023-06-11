@@ -264,7 +264,7 @@ def send_message(recipient):
         db.session.add(msg)
         user_instance.add_notification(
             constants.UNREAD_MSG_COUNT_NOTIF,
-            user_instance.new_messages_count(),
+            user_instance.new_messages_count,
         )
         db.session.commit()
         flash(_('Your message has been sent.'))

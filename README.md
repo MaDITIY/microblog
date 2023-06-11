@@ -60,9 +60,10 @@ REDIS_URL="<your-connection-url>"
 ```
 * `Microsoft Translator` created in `Microsoft Azure Cloud` for posts automatic native language translate functionality
 ```shell
+LANGUAGES="<comma-separated-language-codes>"
+APP_TRANSLATOR="ms_translator"
 MS_TRANSLATOR_KEY="<microsof-translator-key>"
 MS_TRANSLATOR_LOCATION="<ms-translator-location>"
-LANGUAGES="<comma-separated-language-codes>"
 ```
 * SMTP server configured to send password reset main and profile export mail
 ```shell

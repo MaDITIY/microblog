@@ -35,6 +35,7 @@ class Config(object):
     ADMINS = os.environ.get('ADMINS', ['microblog235@gmail.com'])
 
     LANGUAGES = os.environ.get('LANGUAGES', '').split(',') or ['en', 'ru', 'by']
+    APP_TRANSLATOR = os.environ.get('APP_TRANSLATOR')
     MS_TRANSLATOR_KEY = os.environ.get('MS_TRANSLATOR_KEY')
     MS_TRANSLATOR_LOCATION = os.environ.get('MS_TRANSLATOR_LOCATION')
 

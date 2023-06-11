@@ -13,6 +13,7 @@ from flask_login import UserMixin
 import jwt
 import redis
 import rq
+from sqlalchemy.orm.query import Query
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
@@ -91,13 +92,13 @@ class User(db.Model, UserMixin, PaginatedAPI):
         if self.is_following(user):
             self.followed.remove(user)
 
-    def is_following(self, user: 'User') -> None:
+    def is_following(self, user: 'User') -> bool:
         """Check if self is following given user."""
         return self.followed.filter(
             followers.c.followed_id == user.id
         ).count() > 0
 
-    def followed_posts(self):
+    def followed_posts(self) -> Query:
         """Get all posts of people who are followed with own posts."""
         followed = Post.query.join(
             followers, (followers.c.followed_id == Post.user_id)
@@ -112,8 +113,7 @@ class User(db.Model, UserMixin, PaginatedAPI):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
 
-    # TODO: Add typing to verification methods.
-    def get_reset_password_token(self, expires_in=600):
+    def get_reset_password_token(self, expires_in: int = 600) -> str:
         """Get JWT token for password reset."""
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
@@ -122,7 +122,7 @@ class User(db.Model, UserMixin, PaginatedAPI):
         )
 
     @staticmethod
-    def verify_reset_password_token(token):
+    def verify_reset_password_token(token: str) -> Optional['User']:
         """Verify reset password token."""
         try:
             user_id = jwt.decode(
@@ -134,7 +134,7 @@ class User(db.Model, UserMixin, PaginatedAPI):
             return
         return User.query.get(user_id)
 
-    # TODO: could be a property instead?
+    @property
     def new_messages_count(self) -> int:
         """Gather unread messages."""
         last_read_time = self.last_message_read_time or datetime(1900, 1, 1)
