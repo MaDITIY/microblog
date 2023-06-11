@@ -84,11 +84,13 @@ def index():
     posts = posts_paginator.items
     return render_template(
         "index.html",
-        title="Explore",
+        title="Home",
         form=form,
         posts=posts,
         next_page_url=next_page_url,
         prev_page_url=prev_page_url,
+        new_page_title="Older posts",
+        prev_page_title="Newer posts",
     )
 
 
@@ -118,6 +120,8 @@ def explore():
         posts=posts,
         next_page_url=next_page_url,
         prev_page_url=prev_page_url,
+        new_page_title="Older posts",
+        prev_page_title="Newer posts",
     )
 
 
