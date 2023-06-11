@@ -1,5 +1,8 @@
+from typing import Union
+
 from flask import render_template
 from flask import request
+from flask.typing import ResponseReturnValue
 
 from app import db
 from app.errors import bp
@@ -13,7 +16,7 @@ def wants_json_response() -> bool:
 
 
 @bp.app_errorhandler(404)
-def not_found_error(error):
+def not_found_error(error: Exception) -> Union[str, ResponseReturnValue]:
     """Custom Error handler for 404 code."""
     if wants_json_response():
         return api_error_response(404)
@@ -21,7 +24,7 @@ def not_found_error(error):
 
 
 @bp.app_errorhandler(500)
-def internal_error(error):
+def internal_error(error: Exception) -> Union[str, ResponseReturnValue]:
     """Custom Error handler for 500 code."""
     db.session.rollback()
     if wants_json_response():
