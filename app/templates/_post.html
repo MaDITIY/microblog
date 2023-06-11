@@ -15,12 +15,16 @@
             {% endset %}
             {{ _('%(username)s said %(when)s:', username=user_link, when=moment(post.timestamp).fromNow()) }}
             <br>
-            <span id="post{{ post.id }}">{{ post.body }}</span>
+            <span class="post-body" id="post{{ post.id }}">{{ post.body }}</span>
             <br>
             {% if post.language and post.language != g.locale %}
                 <br><br>
                 <span id="translation{{ post.id }}">
-                    <a href="javascript:translate('#post{{ post.id }}', '#translation{{ post.id }}', '{{ post.language }}', '{{ g.locale }}');">{{ _('Translate') }}</a>
+                    <button
+                        class="btn btn-default translate-button"
+                        data-post-language="{{ post.language }}"
+                        data-user-language="{{ g.locale }}"
+                    >Translate</button>
                 </span>
             {% endif %}
         </td>
