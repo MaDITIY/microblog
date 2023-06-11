@@ -2,9 +2,10 @@ from flask import current_app
 from flask import render_template
 
 from app.email import send_email
+from app.models import User
 
 
-def send_password_reset_email(user):
+def send_password_reset_email(user: User) -> None:
     """Send email to user to reset password."""
     token = user.get_reset_password_token()
     send_email(

@@ -1,8 +1,11 @@
+from typing import Union
+
 from flask import flash
 from flask import render_template
 from flask import redirect
 from flask import request
 from flask import url_for
+from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_login import login_user
 from flask_login import logout_user
@@ -19,7 +22,7 @@ from app.models import User
 
 
 @bp.route('/login', methods=['GET', 'POST'])
-def login():
+def login() -> Union[str, ResponseReturnValue]:
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     form = LoginForm()
@@ -37,13 +40,13 @@ def login():
 
 
 @bp.route('/logout')
-def logout():
+def logout() -> ResponseReturnValue:
     logout_user()
     return redirect(url_for('main.index'))
 
 
 @bp.route('/register', methods=['GET', 'POST'])
-def register():
+def register() -> Union[str, ResponseReturnValue]:
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     form = RegistrationForm()
@@ -58,7 +61,7 @@ def register():
 
 
 @bp.route('/reset_password_request', methods=['GET', 'POST'])
-def reset_password_request():
+def reset_password_request() -> Union[str, ResponseReturnValue]:
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     form = ResetPasswordRequestForm()
@@ -72,7 +75,7 @@ def reset_password_request():
 
 
 @bp.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
+def reset_password(token: str) -> Union[str, ResponseReturnValue]:
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     user_instance = User.verify_reset_password_token(token)
