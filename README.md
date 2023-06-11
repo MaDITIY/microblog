@@ -41,11 +41,11 @@ Getting started with microblog base functionality should be fast and easy. Here 
 
 ```flask run --host 0.0.0.0 --port 8080```
 
-### Accesing microblog
+### Accessing microblog
 Application is now accessible on <http://localhost:8080/>
 
 
-### Extra features prerequesties:
+### Extra features prerequisites:
 * One of RDMS server running locally (`PostgreSQL`, `MySQL` or `SQLite`). Env vars:
 ```shell
 SQLALCHEMY_DATABASE_URI="<your-connection-url>"
@@ -71,8 +71,22 @@ MAIL_SERVER=smtp.gmail.com
 MAIL_PORT=465
 MAIL_USE_SSL=1
 MAIL_USE_TLS=0
-MAIL_USERNAME="<your-email-adress>"
+MAIL_USERNAME="<your-email-address>"
 MAIL_PASSWORD="<mail-app-password>"
+```
+
+## App locales introduction and configuration.
+Microblog is partially written babel-formatted so multiple localizations could be added.
+
+### Improved CLI
+Microblog application has improved CLI to build, rebuild and compile localizations.
+Example usage for Spanish localization:
+```shell
+flask translate init es
+
+flask translate update # To update in case of modification.
+
+flask translate compile # To compile completed localization.
 ```
 
 ## Next steps and action items
