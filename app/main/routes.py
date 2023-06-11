@@ -15,6 +15,7 @@ from flask_login import login_required
 from guess_language import guess_language
 
 from app import db
+from app import constants
 from app.main import bp
 from app.main.forms import EditProfileForm
 from app.main.forms import EmptyForm
@@ -26,11 +27,6 @@ from app.models import Notification
 from app.models import Post
 from app.models import User
 from app.translate import translate
-
-
-UNKNOWN_LANGUAGE = 'UNKNOWN'
-UNREAD_MSG_COUNT_NOTIF = 'unread_message_count'
-MAX_LANGUAGE_LEN = 10
 
 
 @bp.before_request
@@ -58,7 +54,10 @@ def index():
     if form.validate_on_submit():
         post_body = form.post.data
         language = guess_language(post_body)
-        if language == UNKNOWN_LANGUAGE or len(language) > 10:
+        if (
+                language == constants.UNKNOWN_LANGUAGE or 
+                len(language) > constants.MAX_LANGUAGE_LEN
+        ):
             language = ""
         post = Post(body=post_body, author=current_user, language=language)
         db.session.add(post)
@@ -264,7 +263,7 @@ def send_message(recipient):
         )
         db.session.add(msg)
         user_instance.add_notification(
-            UNREAD_MSG_COUNT_NOTIF,
+            constants.UNREAD_MSG_COUNT_NOTIF,
             user_instance.new_messages_count(),
         )
         db.session.commit()
@@ -282,7 +281,7 @@ def send_message(recipient):
 @login_required
 def messages():
     current_user.last_message_read_time = datetime.utcnow()
-    current_user.add_notification(UNREAD_MSG_COUNT_NOTIF, 0)
+    current_user.add_notification(constants.UNREAD_MSG_COUNT_NOTIF, 0)
     db.session.commit()
     page = request.args.get('page', 1, type=int)
     messages_paginator = current_user.messages_received.order_by(
@@ -328,9 +327,9 @@ def notifications():
 @bp.route('/export_posts')
 @login_required
 def export_posts():
-    if current_user.get_task_in_progress('export_posts'):
+    if current_user.get_task_in_progress(constants.EXPORT_POSTS_BG):
         flash(_('An export task is currently in progress'))
     else:
-        current_user.launch_task('export_posts', _('Exporting posts.'))
+        current_user.launch_task(constants.EXPORT_POSTS_BG, _('Exporting posts.'))
         db.session.commit()
     return redirect(url_for('main.user', username=current_user.username))

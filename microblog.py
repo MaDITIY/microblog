@@ -8,10 +8,6 @@ from app.models import Task
 from app.models import User
 
 
-# General App TODOs:
-# TODO: Introduce dev constants module for BGtasks and notifications names.
-
-
 app = create_app()
 cli.register(app)
 

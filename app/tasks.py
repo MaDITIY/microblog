@@ -5,6 +5,7 @@ import time
 from flask import render_template
 from rq import get_current_job
 
+from app import constants
 from app import create_app
 from app import db
 from app.email import send_email
@@ -25,7 +26,7 @@ def _set_task_progress(progress: int) -> None:
         job.save_meta()
         task = Task.query.get(job.get_id())
         task.user.add_notification(
-            'task_progress',
+            constants.TASK_PROGRESS_NOTIF,
             {
                 'task_id': job.get_id(),
                 'progress': progress,
@@ -73,16 +74,3 @@ def export_posts(user_id):
     except:
         _set_task_progress(100)
         app.logger.error('Unhandled exception', exc_info=sys.exc_info())
-
-
-def example(seconds):
-    job = get_current_job()
-    print('Starting task')
-    for i in range(seconds):
-        job.meta['progress'] = 100.0 * i / seconds
-        job.save_meta()
-        print(i)
-        time.sleep(1)
-    job.meta['progress'] = 100
-    job.save_meta()
-    print('Task completed')
