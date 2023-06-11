@@ -84,7 +84,9 @@ MAIL_PASSWORD="<mail-app-password>"
 * Flask
 * SQLAlchemy
 * PostgreSQL
-* Babel
+* Alembic
 * Redis Queue
 * Microsoft Azure Cloud: Microsoft Translator
+* Babel
 * Bootstrap
+* jQuery
