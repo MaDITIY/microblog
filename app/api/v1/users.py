@@ -1,6 +1,7 @@
 from flask import jsonify
 from flask import request
 from flask import url_for
+from flask.typing import ResponseReturnValue
 
 from app import db
 from app.api.v1 import bp
@@ -20,7 +21,7 @@ USER_CREATE_MANDATORY_FIELDS = {
 
 @bp.route('/users/<int:id>', methods=['GET'])
 @token_auth.login_required
-def get_user(id):
+def get_user(id: int) -> ResponseReturnValue:
     """Get single user by ID."""
     user_dict = User.query.get_or_404(id).to_dict()
     return jsonify(user_dict)
@@ -28,7 +29,7 @@ def get_user(id):
 
 @bp.route('/users', methods=['GET'])
 @token_auth.login_required
-def get_users():
+def get_users() -> ResponseReturnValue:
     """Get all application users."""
     page = request.args.get('page', 1, type=int)
     per_page = min(request.args.get('per_page', 10, type=int), MAX_COLLECTIONS_COUNT)
@@ -43,7 +44,7 @@ def get_users():
 
 @bp.route('/users/<int:id>/followers', methods=['GET'])
 @token_auth.login_required
-def get_followers(id):
+def get_followers(id: int) -> ResponseReturnValue:
     """Get User followers by user ID."""
     user = User.query.get_or_404(id)
     page = request.args.get('page', 1, type=int)
@@ -56,7 +57,7 @@ def get_followers(id):
 
 @bp.route('/users/<int:id>/followed', methods=['GET'])
 @token_auth.login_required
-def get_followed(id):
+def get_followed(id: int) -> ResponseReturnValue:
     """Get User followed by user ID."""
     user = User.query.get_or_404(id)
     page = request.args.get('page', 1, type=int)
@@ -68,7 +69,7 @@ def get_followed(id):
 
 
 @bp.route('/users', methods=['POST'])
-def create_user():
+def create_user() -> ResponseReturnValue:
     """Register new user profile."""
     data = request.get_json() or {}
     request_fields = set(data)
@@ -92,7 +93,7 @@ def create_user():
 
 @bp.route('/users/<int:id>', methods=['PUT'])
 @token_auth.login_required
-def update_user(id):
+def update_user(id: int) -> ResponseReturnValue:
     """Update existing user by its ID."""
     user = User.query.get_or_404(id)
     data = request.get_json() or {}
