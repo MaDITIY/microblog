@@ -54,7 +54,7 @@ SQLALCHEMY_DATABASE_URI="<your-connection-url>"
 ```shell
 ELASTICSEARCH_URL="<your-connection-url>"
 ```
-* `Reddis Queue` for profile export functionality. Env vars:
+* `Reddis Queue` with workers for profile export functionality. Env vars:
 ```shell
 REDIS_URL="<your-connection-url>"
 ```
