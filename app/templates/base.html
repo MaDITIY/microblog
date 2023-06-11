@@ -3,80 +3,9 @@
 {% block scripts %}
     {{ super() }}
     {{ moment.include_moment() }}
-    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+<!--    <script src="{{ url_for('static', filename='scripts.js') }}"></script>-->
     <script>
-        $(function() {
-            $('.user_popup').hover(
-                function(event) {
-                    var elem = $(event.currentTarget);
-                    timer = setTimeout(function() {
-                        timer = null;
-                        xhr = $.ajax(
-                            '/user/' + elem.first().text().trim() + '/popup').done(
-                                function(data) {
-                                    xhr = null
-                                    elem.popover({
-                                        trigger: 'manual',
-                                        html: true,
-                                        animation: false,
-                                        container: elem,
-                                        content: data
-                                    }).popover('show');
-                                    flask_moment_render_all();
-                                }
-                        );
-                    }, 1000);
-                },
-                function(event) {
-                    var elem = $(event.currentTarget);
-                    if (timer){
-                        clearTimeout(timer);
-                        timer = null;
-                    }
-                    else if (xhr) {
-                        xhr.abort();
-                        xhr = null;
-                    }
-                    else {
-                        elem.popover('destroy');
-                    };
-                }
-            )
-        });
-
-        function set_message_count(n) {
-            $('#message_count').text(n);
-            $('#message_count').css('visibility', n ? 'visible' : 'hidden');
-        }
-
-        {% if current_user.is_authenticated %}
-            $(function() {
-                var since = 0;
-                setInterval(function() {
-                    $.ajax('{{ url_for('main.notifications') }}?since=' + since).done(
-                        function(notifications) {
-                            for (var i = 0; i < notifications.length; i++) {
-                                switch (notifications[i].name) {
-                                    case 'unread_message_count':
-                                        set_message_count(notifications[i].data);
-                                        break;
-                                    case 'task_progress':
-                                        set_task_progress(
-                                            notifications[i].data.task_id,
-                                            notifications[i].data.progress);
-                                        break;
-                                }
-                                since = notifications[i].timestamp;
-                            }
-                        }
-                    );
-                }, 5000);
-            });
-        {% endif %}
-
-        function set_task_progress(task_id, progress) {
-            $('#' + task_id + '-progress').text(progress);
-        }
+        {% include "scripts.js" %}
     </script>
 {% endblock %}
 
