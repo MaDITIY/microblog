@@ -12,15 +12,15 @@ translateButtonList.forEach((translateButton) => {
     })
 })
 
-function translate(sourceElem, destElem, sourceLang, destLang) {
-    $(destElem).html('<img src="./static/loading.gif">');
+function translate(sourceElemSelector, destElemSelector, sourceLang, destLang) {
+    $(destElemSelector).html('<img src="./static/loading.gif">');
     $.post('/translate', {
-        text: $(sourceElem).text(),
+        text: $(sourceElemSelector).text(),
         source_language: sourceLang,
         dest_language: destLang
     }).done(function(response) {
-        $(destElem).text(response['text'])
+        $(destElemSelector).text(response['text'])
     }).fail(function() {
-        $(destElem).text("{{ _('Error: Could not contact server.') }}");
+        $(destElemSelector).text("Error: Could not contact server");
     });
 }
